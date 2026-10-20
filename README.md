@@ -66,6 +66,28 @@ Install the following before running the application:
 
 The sample records are fictional and intended for local testing.
 
+### Database Design and Connection Approach
+
+**Database choice: MySQL**
+
+MySQL is used as the relational database because employee records have a well-defined structure. The `employees` table stores `id`, `name`, `email`, `department`, `designation`, and `date_of_joining`. The `id` is the primary key, `email` is unique, and indexes on `name` and `department` support employee searches.
+
+**Safe database connectivity**
+
+The backend uses SQLAlchemy as its ORM and PyMySQL as the MySQL driver. Database credentials are loaded from environment variables through the application configuration rather than being hardcoded in the source code. The actual `.env` file is excluded from Git, while `.env.example` provides placeholders for setup.
+
+SQLAlchemy's query-building interface and parameterized queries help protect against SQL injection by separating query values from SQL syntax.
+
+**Connection pooling and scalability**
+
+SQLAlchemy's connection pool reuses database connections instead of establishing a new connection for every request. The application configures `pool_pre_ping=True` to check pooled connections before using them, `pool_size=5` for the normal pool size, and `max_overflow=10` to allow additional temporary connections when demand increases. `pool_recycle=1800` recycles connections after 30 minutes.
+
+This approach reduces connection setup overhead and improves reliability when handling multiple requests. Pool sizes should be adjusted according to deployment traffic and MySQL's connection limits.
+
+**Why this approach is suitable**
+
+Combining MySQL, SQLAlchemy, environment-based configuration, parameterized queries, and connection pooling provides structured data storage, safer database access, maintainable code, and a foundation for handling increased request volume.
+
 ## Backend Setup
 
 From the project root, open a terminal and run:
